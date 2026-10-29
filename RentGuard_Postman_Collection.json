@@ -1,0 +1,211 @@
+{
+  "info": {
+    "name": "RentGuard REST API Collection",
+    "description": "Postman API testing collection for RentGuard Rental Property Verification & Scam Prevention Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "jwtToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@rentguard.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login (Tenant)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tenant@rentguard.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Tenant\",\n  \"email\": \"newtenant@example.com\",\n  \"password\": \"Password123!\",\n  \"phone\": \"+91 99999 11111\",\n  \"role\": \"ROLE_TENANT\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Listings & Search",
+      "item": [
+        {
+          "name": "Search Listings (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/listings?city=Noida&maxRisk=59",
+              "host": ["{{baseUrl}}"],
+              "path": ["listings"],
+              "query": [
+                { "key": "city", "value": "Noida" },
+                { "key": "maxRisk", "value": "59" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Listing Details & Risk Audit",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/listings/1"
+          }
+        },
+        {
+          "name": "Create Listing (Owner / Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"propertyId\": 1,\n  \"rent\": 18500,\n  \"deposit\": 37000,\n  \"description\": \"Clean 2 BHK apartment near Sector 62 metro\",\n  \"imageUrls\": [\"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00\"]\n}"
+            },
+            "url": "{{baseUrl}}/listings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Verification (KYC)",
+      "item": [
+        {
+          "name": "Submit Verification Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"GOVERNMENT_ID\",\n  \"filePath\": \"aadhaar_card_doc.pdf\"\n}"
+            },
+            "url": "{{baseUrl}}/verification/submit"
+          }
+        },
+        {
+          "name": "Get Pending Verifications (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/admin/verifications"
+          }
+        },
+        {
+          "name": "Approve / Reject Verification (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"notes\": \"Government ID and tax receipt verified authentic.\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/verifications/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Reports & Scam Moderation",
+      "item": [
+        {
+          "name": "Report Listing (Tenant)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"PRICE_SCAM\",\n  \"description\": \"Owner asked for advance transfer via UPI before letting me view the flat.\"\n}"
+            },
+            "url": "{{baseUrl}}/listings/4/report"
+          }
+        },
+        {
+          "name": "Get Reports (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/admin/reports"
+          }
+        },
+        {
+          "name": "Suspend Listing (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Confirmed advance deposit phishing scam reported by multiple tenants\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/listings/4/suspend"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin Dashboard & Analytics",
+      "item": [
+        {
+          "name": "Get Scam Analytics & Risk Distribution",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/admin/analytics"
+          }
+        },
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/admin/audit-logs"
+          }
+        }
+      ]
+    }
+  ]
+}

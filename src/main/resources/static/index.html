@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentGuard — Rental Property Verification & Scam Prevention Platform</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand" onclick="event.preventDefault(); switchTab('browse');">
+                <div class="brand-shield">🛡️</div>
+                <span>RentGuard</span>
+                <span class="brand-badge">Scam Prevention</span>
+            </a>
+
+            <div class="nav-links">
+                <div class="nav-link active tab-btn" data-tab="browse" onclick="switchTab('browse')">🔍 Search Properties</div>
+                <div class="nav-link tab-btn" id="tab-tenant-btn" data-tab="tenant" style="display:none" onclick="switchTab('tenant')">👤 Tenant Activity</div>
+                <div class="nav-link tab-btn" id="tab-owner-btn" data-tab="owner" style="display:none" onclick="switchTab('owner')">🏠 Owner Dashboard</div>
+                <div class="nav-link tab-btn" id="tab-admin-btn" data-tab="admin" style="display:none" onclick="switchTab('admin')">👑 Admin & Analytics</div>
+            </div>
+
+            <div id="auth-actions" class="auth-panel">
+                <!-- Injected dynamically by app.js -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Container -->
+    <main class="main-container">
+
+        <!-- TAB 1: BROWSE PROPERTIES -->
+        <section id="pane-browse" class="tab-pane">
+            <!-- Hero Header -->
+            <div class="hero">
+                <div style="font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#a5b4fc; margin-bottom:0.5rem">
+                    Java Full Stack • Explainable Fraud Detection (No ML Required)
+                </div>
+                <h1>Risk-Aware Rental Property Verification Platform</h1>
+                <p>
+                    RentGuard protects tenants and landlords by combining government KYC verification, price anomaly statistics, SHA-256 duplicate image detection, and geo-clustering into a transparent 0–100 risk score.
+                </p>
+
+                <div class="hero-features">
+                    <div class="hero-badge">
+                        <span>🛡️</span> 0–29 Low Risk Verified
+                    </div>
+                    <div class="hero-badge">
+                        <span>📊</span> Real-Time Median Price Deviation
+                    </div>
+                    <div class="hero-badge">
+                        <span>🔍</span> SHA-256 Duplicate Image Fingerprinting
+                    </div>
+                    <div class="hero-badge">
+                        <span>📍</span> Haversine Geo-Proximity Tolerance
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter Card -->
+            <div class="search-card">
+                <form id="search-form" class="search-grid">
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" id="filter-city" class="form-control" placeholder="e.g. Noida, Bengaluru">
+                    </div>
+                    <div class="form-group">
+                        <label>Locality / Sector</label>
+                        <input type="text" id="filter-locality" class="form-control" placeholder="e.g. Sector 62">
+                    </div>
+                    <div class="form-group">
+                        <label>Bedrooms (BHK)</label>
+                        <select id="filter-bhk" class="form-control">
+                            <option value="">Any BHK</option>
+                            <option value="1">1 BHK</option>
+                            <option value="2">2 BHK</option>
+                            <option value="3">3 BHK</option>
+                            <option value="4">4+ BHK</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Max Risk Score Filter</label>
+                        <select id="filter-max-risk" class="form-control">
+                            <option value="">All Risk Levels</option>
+                            <option value="29">🛡️ Low Risk Only (&le; 29)</option>
+                            <option value="59">⚠️ Medium &amp; Low (&le; 59)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="height:2.75rem">
+                        🔍 Search
+                    </button>
+                </form>
+            </div>
+
+            <!-- Listings Header -->
+            <div class="listings-header">
+                <div>
+                    <h2 style="font-size:1.5rem; font-weight:800; color:var(--slate-900)">Featured Rental Listings</h2>
+                    <p style="color:var(--slate-500); font-size:0.9rem">All listings continuously scored by RentGuard explainable risk engine.</p>
+                </div>
+                <div id="listings-count" style="font-size:0.9rem; font-weight:600; color:var(--slate-600)">
+                    Loading...
+                </div>
+            </div>
+
+            <!-- Listings Grid -->
+            <div id="listings-grid" class="listings-grid">
+                <!-- Dynamically populated by app.js -->
+            </div>
+        </section>
+
+        <!-- TAB 2: OWNER PORTAL -->
+        <section id="pane-owner" class="tab-pane" style="display:none">
+            <!-- Dynamically populated by loadOwnerPortal() in app.js -->
+        </section>
+
+        <!-- TAB 3: TENANT PORTAL -->
+        <section id="pane-tenant" class="tab-pane" style="display:none">
+            <!-- Dynamically populated by loadTenantPortal() in app.js -->
+        </section>
+
+        <!-- TAB 4: ADMIN DASHBOARD & ANALYTICS -->
+        <section id="pane-admin" class="tab-pane" style="display:none">
+            <!-- Dynamically populated by loadAdminDashboard() in app.js -->
+        </section>
+
+    </main>
+
+    <!-- Global Application Modal -->
+    <div id="app-modal" class="modal-backdrop" style="display:none" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- Dynamic body content -->
+            </div>
+            <div id="modal-footer" class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

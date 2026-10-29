@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rentguard-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: rentguard
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local_dev_only_change_me}
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/schema-mysql.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", 'mysqladmin ping -h localhost -uroot -p"$${MYSQL_ROOT_PASSWORD}" --silent']
+      interval: 5s
+      timeout: 20s
+      retries: 20
+
+  app:
+    build: .
+    container_name: rentguard-app
+    restart: on-failure
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      DB_URL: jdbc:mysql://mysql:3306/rentguard?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local_dev_only_change_me}
+      JWT_SECRET: ${JWT_SECRET:-dGVzdC1vbmx5LXJlbnRndWFyZC1qd3Qta2V5LWNoYW5nZS1tZQ==}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+
+volumes:
+  mysql_data:
